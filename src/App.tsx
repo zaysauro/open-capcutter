@@ -254,10 +254,19 @@ export default function App() {
       if (parsed.schemaVersion !== 1 || !Array.isArray(parsed.assets) || !Array.isArray(parsed.clips)) {
         throw new Error("This is not a supported CapCutter project file.");
       }
+      const restoredUrls: Record<string, string> = {};
+      for (const asset of parsed.assets) {
+        try {
+          const blob = await getMedia(asset.id);
+          if (blob) restoredUrls[asset.id] = URL.createObjectURL(blob);
+        } catch { /* Missing media is handled by the preview's missing-file state. */ }
+      }
+      setUrls((current) => ({ ...current, ...restoredUrls }));
       setProject(parsed);
       setSelectedClipId(parsed.clips[0]?.id ?? null);
       setPlayhead(0);
-      setNotice("Project structure loaded. Previously imported media must still exist in this browser's local storage.");
+      const missingCount = parsed.assets.filter((asset) => !restoredUrls[asset.id] && !urls[asset.id]).length;
+      setNotice(missingCount ? `Project loaded. ${missingCount} source file(s) need to be re-imported.` : "Project loaded with locally available media.");
     } catch (error) {
       setNotice(error instanceof Error ? error.message : "Could not open project.");
     }
