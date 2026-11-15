@@ -2,7 +2,7 @@ import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "
 import {
   AudioLines, Clapperboard, Film, FolderOpen, Import, Layers3, Maximize2, MoreHorizontal,
   Music2, Pause, Play, Plus, Scissors, Settings2, SkipBack, SkipForward, Sparkles,
-  Trash2, Upload, Volume2, WandSparkles, X,
+  Trash2, Upload, Volume2, WandSparkles,
 } from "lucide-react";
 import {
   clipDuration, createProject, EditorProject, formatTime, makeId, projectDuration,
@@ -52,6 +52,7 @@ export default function App() {
   const [busy, setBusy] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
+  const projectInput = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const duration = useMemo(() => projectDuration(project.clips), [project.clips]);
@@ -92,10 +93,6 @@ export default function App() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => () => {
-    Object.values(urls).forEach((url) => URL.revokeObjectURL(url));
-  }, [urls]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -276,9 +273,9 @@ export default function App() {
         <div className="project-title"><span className="status-dot" /><input aria-label="Project name" value={project.name} onChange={(e) => updateProject((p) => ({ ...p, name: e.target.value }))} /></div>
         <div className="top-actions">
           <button className="quiet-button" onClick={() => setShowSettings((value) => !value)}><Settings2 size={16} /> Settings</button>
-          <button className="outline-button" onClick={loadProjectFile}><FolderOpen size={16} /> Open project</button>
+          <button className="outline-button" onClick={() => projectInput.current?.click()}><FolderOpen size={16} /> Open project</button>
           <button className="primary-button" onClick={saveProjectFile}><Import size={16} /> Save project</button>
-          <input className="hidden-input" type="file" accept=".json,.capcutter.json,application/json" onChange={loadProjectFile} id="project-open" />
+          <input ref={projectInput} className="hidden-input" type="file" accept=".json,application/json" onChange={loadProjectFile} id="project-open" />
         </div>
       </header>
 
