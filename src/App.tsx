@@ -1,12 +1,12 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   AudioLines, Clapperboard, Film, FolderOpen, Import, Layers3, Maximize2, MoreHorizontal, Download,
   Music2, Pause, Play, Plus, Scissors, Settings2, SkipBack, SkipForward, Sparkles,
   Trash2, Upload, Volume2, WandSparkles,
 } from "lucide-react";
 import {
-  clipDuration, createProject, EditorProject, formatTime, makeId, projectDuration,
-  TimelineClip,
+  clipDuration, createProject, formatTime, makeId, projectDuration,
+  type EditorProject, type TimelineClip,
 } from "./lib/project";
 import { getMedia, saveMedia } from "./lib/storage";
 import { exportTimelineWebM } from "./lib/export";
