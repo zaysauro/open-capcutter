@@ -1,66 +1,38 @@
 # CapCutter
 
-**Local-first, offline-capable video editor.** An independent editor inspired by OpenCut and the simplicity of CapCut, designed to keep media and projects on the user's machine.
+CapCutter is a local-first video editor. Source media remains on the current device.
 
-> Status: early MVP foundation. The current app supports local video import, preview, a basic timeline, trimming, splitting, project JSON export/import, and local project persistence. Final video rendering, audio mixing, desktop installers, and AI-assisted editing are not implemented yet.
+## Current working features
 
-## Product principles
+- Import local video files into a project.
+- Preview and play a sequential video timeline.
+- Trim clip in/out points, split clips, and remove clips.
+- Persist project metadata and media blobs locally in IndexedDB.
+- Save and reopen a `.capcutter.json` project file.
+- Export the edited sequence as WebM locally, including source audio where supported.
 
-- **Local-first:** media is read and stored locally; no account, analytics, or upload service is configured.
-- **Offline target:** the app has no remote API dependency. The editor UI uses system fonts and local assets. The planned desktop package will bundle the runtime and media engine.
-- **Non-destructive editing:** timeline clips reference original media and trim ranges.
-- **Cross-platform:** Windows first for validation, followed by macOS and Linux.
-- **Honest capabilities:** implemented, experimental, and planned features are distinguished.
+## Run it as a desktop app
 
-## Current MVP
+Install dependencies with `npm install`, then launch the native window with `npm run tauri:dev`.
 
-- Import local video files.
-- Preview the selected clip.
-- Basic sequential video timeline.
-- Play/pause and playhead navigation.
-- Set clip in/out points and split at the playhead.
-- Remove clips from the timeline.
-- Persist project metadata in localStorage and media blobs in IndexedDB.
-- Export/import a `.capcutter.json` project structure.
+Create an installer for the current operating system with `npm run tauri:build`.
 
-## Roadmap
+Tauri 2 prerequisites: Rust toolchain; on macOS, Xcode Command Line Tools; on Windows, Microsoft C++ Build Tools and WebView2 Runtime. Build separately on macOS and Windows to produce native installers for each platform.
 
-1. **Editing foundation:** timeline drag-and-drop, undo/redo, audio tracks, thumbnails and waveform.
-2. **Rendering engine:** bundled FFmpeg/native media pipeline, export presets, progress and cancellation.
-3. **Desktop packaging:** Tauri shell and installers for Windows, macOS (Apple Silicon + Intel), and Linux.
-4. **Offline AI tools:** local Whisper transcription, subtitle editor, silence detection, scene segmentation and suggested vertical cuts.
-5. **Creator workflow:** aspect-ratio canvas, captions, titles, transitions, filters, templates and batch export.
+## Run it in a browser
 
-## Development
+Run `npm install` and `npm run dev`. Open the local address printed by Vite (normally http://127.0.0.1:5173).
 
-Requirements: Node.js 20+ and npm 10+.
+Build and validate with `npm run typecheck` and `npm run build`.
 
-```bash
-npm install
-npm run dev
-```
+## Export notes
 
-Build and type-check:
+The first export target is WebM because current Chromium browsers provide a built-in local MediaRecorder encoder. Use current Chrome or Edge for the most reliable result. MP4/H.264 export, a bundled FFmpeg engine, native audio timeline tracks, captions, and offline AI transcription are subsequent milestones.
 
-```bash
-npm run typecheck
-npm run build
-npm run preview
-```
+## Privacy and project portability
 
-## Project structure
-
-- `src/App.tsx` — editor shell and timeline interactions.
-- `src/lib/project.ts` — project and clip data model.
-- `src/lib/storage.ts` — IndexedDB media persistence.
-- `src/styles.css` — editor interface.
-
-## Offline and privacy notes
-
-There is no analytics, authentication, remote API, or media upload path in this MVP. Video files are read locally and media blobs are stored in the browser's IndexedDB for the current browser profile. Browser storage can be cleared by the browser or operating system; keep source media backed up.
-
-**The MVP does not yet render a finished MP4.** Project JSON stores the edit structure, not the actual video files. When opening a project on another browser or computer, source media must be imported again. Native desktop packaging, portable project bundles, and a bundled FFmpeg engine are future milestones.
+There is no account, analytics, upload endpoint, or remote media processing. Video blobs remain in the browser's IndexedDB. A project JSON file contains the edit structure, not the media itself. Re-import source files if browser storage is cleared or the project is opened on another device.
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+MIT. The original OpenCut reference is MIT-licensed; this repository's implementation is maintained separately.
