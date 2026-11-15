@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 import {
   clipDuration, createProject, formatTime, makeId, projectDuration,
-  type EditorProject, type TimelineClip,
+  type EditorProject, type MediaAsset, type TimelineClip,
 } from "./lib/project";
 import { getMedia, saveMedia } from "./lib/storage";
 import { exportTimelineWebM } from "./lib/export";
@@ -129,7 +129,7 @@ export default function App() {
     if (!files.length) return;
     setBusy(true);
     try {
-      const imported = [];
+      const imported: MediaAsset[] = [];
       for (const file of files) {
         if (!file.type.startsWith("video/")) continue;
         const mediaDuration = await readDuration(file);
