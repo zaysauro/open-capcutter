@@ -1,6 +1,6 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  AudioLines, Clapperboard, Film, FolderOpen, Import, Layers3, Maximize2, MoreHorizontal,
+  AudioLines, Clapperboard, Film, FolderOpen, Import, Layers3, Maximize2, MoreHorizontal, Download,
   Music2, Pause, Play, Plus, Scissors, Settings2, SkipBack, SkipForward, Sparkles,
   Trash2, Upload, Volume2, WandSparkles,
 } from "lucide-react";
@@ -9,6 +9,7 @@ import {
   TimelineClip,
 } from "./lib/project";
 import { getMedia, saveMedia } from "./lib/storage";
+import { exportTimelineWebM } from "./lib/export";
 
 const PROJECT_KEY = "capcutter-project-v1";
 
@@ -50,6 +51,7 @@ export default function App() {
   const [volume, setVolume] = useState(1);
   const [notice, setNotice] = useState("Your media stays on this device.");
   const [busy, setBusy] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const projectInput = useRef<HTMLInputElement>(null);
@@ -234,6 +236,21 @@ export default function App() {
     }
   };
 
+  const exportVideo = async () => {
+    if (!project.clips.length || exporting) return;
+    setExporting(true);
+    setPlaying(false);
+    setNotice("Preparing local video export…");
+    try {
+      await exportTimelineWebM(project, (message) => setNotice(message));
+      setNotice("Video export completed. Your WebM file was downloaded.");
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Video export failed.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const saveProjectFile = () => {
     const blob = new Blob([JSON.stringify(project, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -283,7 +300,7 @@ export default function App() {
         <div className="top-actions">
           <button className="quiet-button" onClick={() => setShowSettings((value) => !value)}><Settings2 size={16} /> Settings</button>
           <button className="outline-button" onClick={() => projectInput.current?.click()}><FolderOpen size={16} /> Open project</button>
-          <button className="primary-button" onClick={saveProjectFile}><Import size={16} /> Save project</button>
+          <button className="outline-button" onClick={exportVideo} disabled={!project.clips.length || exporting}><Download size={16} /> {exporting ? "Exporting…" : "Export video"}</button><button className="primary-button" onClick={saveProjectFile}><Import size={16} /> Save project</button>
           <input ref={projectInput} className="hidden-input" type="file" accept=".json,application/json" onChange={loadProjectFile} id="project-open" />
         </div>
       </header>
